@@ -1,0 +1,56 @@
+# Cozmo replica server configuration.
+# Copy to config.local.toml for personal changes and run with
+#   python -m cozmo_server --config config.local.toml
+
+[network]
+host = "0.0.0.0"
+control_port = 5008          # TCP, JSON lines (robot connects here)
+audio_port = 5005            # UDP, robot microphone -> PC
+robot_audio_port = 5007      # UDP, PC speech -> robot speaker
+discovery_port = 5006        # UDP broadcast beacon
+broadcast_address = "255.255.255.255"   # or e.g. "192.168.1.255"
+command_timeout_s = 8.0
+
+[persona]
+name = "Cozmo"
+language = "tr"              # "tr" (Türkçe) or "en"
+wake_words = ["cozmo", "kozmo", "kosmo", "kozmos", "cosmo", "kuzmo", "gozmo"]
+require_wake_word = true     # say "Cozmo, ..." first; follow-ups within the window need no name
+conversation_window_s = 12.0
+react_to_events = true       # talk when picked up, petted, low battery
+
+[vad]
+backend = "energy"           # "energy" or "webrtc" (pip install webrtcvad)
+start_margin_db = 12.0
+stop_margin_db = 7.0
+min_speech_ms = 200
+end_silence_ms = 700
+max_utterance_s = 10.0
+preroll_ms = 300
+webrtc_aggressiveness = 2
+ignore_while_speaking = true
+
+[asr]
+backend = "faster-whisper"   # "faster-whisper", "vosk" or "none"
+model = "small"              # tiny/base are faster, "small" is much better for Turkish
+device = "auto"              # "auto", "cpu" or "cuda"
+compute_type = "int8"
+beam_size = 3
+vosk_model_path = "models/vosk-model-small-tr-0.3"
+
+[tts]
+backend = "espeak"           # "espeak", "piper" or "none"
+voice = ""                   # espeak voice, empty = persona.language
+rate_wpm = 165
+piper_model = "models/tr_TR-dfki-medium.onnx"
+piper_binary = "piper"
+robot_effect = true
+pitch = 1.18
+volume = 0.9
+
+[llm]
+enabled = false              # free-form chat through the Claude API (needs an API key)
+model = "claude-opus-5-5"
+effort = "low"               # low keeps answers fast
+max_history_turns = 8
+use_for_unknown_only = true  # rule-based commands stay instant and free

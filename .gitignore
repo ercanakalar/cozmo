@@ -1,0 +1,24 @@
+# PlatformIO
+firmware/.pio/
+firmware/.vscode/
+firmware/include/secrets.h
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+server/config.local.toml
+server/models/
+
+# OS / editors
+.DS_Store
+.idea/
+*.swp
+
+# Face preview build outputs
+tools/face_preview/face_preview
+tools/face_preview/faces.txt
+tools/face_preview/faces.png
