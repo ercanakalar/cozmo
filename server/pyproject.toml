@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cozmo-server"
+version = "0.1.0"
+description = "PC-side speech brain for the ESP32 Cozmo replica robot"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.24"]
+
+[project.optional-dependencies]
+whisper = ["faster-whisper>=1.0"]
+vosk = ["vosk>=0.3.45"]
+webrtc = ["webrtcvad>=2.0.10"]
+llm = ["anthropic"]
+dev = ["pytest>=8"]
+all = ["faster-whisper>=1.0", "webrtcvad>=2.0.10", "anthropic"]
+
+[project.scripts]
+cozmo-server = "cozmo_server.__main__:main"
+
+[tool.setuptools]
+packages = ["cozmo_server"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
