@@ -24,6 +24,8 @@ and speech that the robot performs.
 * **Expressive face**: 12 eased eye expressions, blinking, gaze, eyes that
   bounce while it talks, 18 keyframe animations combining eyes, head, lift,
   treads, chirps and lights.
+  ![Eye expressions](docs/images/faces.png)
+  (rendered from the real firmware code with `tools/face_preview/run.sh`)
 * **Local reflexes without the PC**: scared when picked up (treads stop),
   purrs when you pet its head, startles at a clap, gets bored and falls
   asleep, warns about a low battery.
@@ -61,7 +63,7 @@ flowchart LR
 | [`firmware/`](firmware) | ESP32 firmware, PlatformIO, C++17. Own drivers for every part in `src/drivers/`. |
 | [`server/`](server) | Python PC server: audio, VAD, ASR, intents, TTS, optional Claude chat. [README](server/README.md) |
 | [`hardware/3d/`](hardware/3d) | Parametric OpenSCAD models + ready STLs |
-| [`tools/`](tools) | `robot_console.py` (manual control / calibration), `fake_robot.py` (server test without hardware) |
+| [`tools/`](tools) | `robot_console.py` (manual control / calibration), `fake_robot.py` (server test without hardware), `face_preview/` (render the eyes on a PC) |
 | [`docs/`](docs) | [Bill of materials](docs/BOM.md) · [Wiring](docs/WIRING.md) · [Printing & assembly](docs/ASSEMBLY.md) · [Protocol](docs/PROTOCOL.md) |
 
 ## Budget

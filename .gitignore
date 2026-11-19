@@ -17,3 +17,8 @@ server/models/
 .DS_Store
 .idea/
 *.swp
+
+# Face preview build outputs
+tools/face_preview/face_preview
+tools/face_preview/faces.txt
+tools/face_preview/faces.png
