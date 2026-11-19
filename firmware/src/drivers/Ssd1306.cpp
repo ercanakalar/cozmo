@@ -158,7 +158,9 @@ void Ssd1306::fillCircle(int cx, int cy, int r, bool on) { fillEllipse(cx, cy, r
 void Ssd1306::fillEllipse(int cx, int cy, int rx, int ry, bool on) {
   if (rx <= 0 || ry <= 0) return;
   for (int dy = -ry; dy <= ry; ++dy) {
-    const float t = 1.0f - static_cast<float>(dy * dy) / static_cast<float>(ry * ry);
+    // Sample at the pixel centre so the extreme rows are not 1 px spikes.
+    const float fy = std::max(0.0f, fabsf(static_cast<float>(dy)) - 0.5f);
+    const float t = 1.0f - (fy * fy) / static_cast<float>(ry * ry);
     const int half = static_cast<int>(rx * sqrtf(std::max(0.0f, t)) + 0.5f);
     hline(cx - half, cx + half, cy + dy, on);
   }

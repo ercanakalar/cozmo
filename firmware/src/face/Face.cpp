@@ -143,8 +143,8 @@ void Face::drawEye(const EyeShape& e, float baseX, int side, float blink) {
   }
   if (e.lidBottom > 0.01f && !sleeping_) {
     // Curved lower lid: a black ellipse pushed up from below ("^ ^").
-    const int rx = static_cast<int>(w * 0.8f);
-    const int ry = static_cast<int>(h * 0.55f);
+    const int rx = static_cast<int>(w * 0.58f);
+    const int ry = static_cast<int>(h * 0.62f);
     const int ecy = static_cast<int>(y0 + h + ry - e.lidBottom * h);
     oled_->fillEllipse(static_cast<int>(cx), ecy, rx, ry, false);
   }
