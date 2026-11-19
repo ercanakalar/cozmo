@@ -16,9 +16,6 @@ namespace {
 constexpr uint32_t kSleepAfterMs = 6UL * 60UL * 1000UL;
 constexpr uint32_t kBoredAfterMs = 3UL * 60UL * 1000UL;
 constexpr int kLoudRms = 7000;
-constexpr float kMaxSpeedMmps = 220.0f;
-constexpr float kTurnSlipFactor = 1.15f;
-constexpr float kImuYawSign = 1.0f;  // flip if turns go the wrong way with the IMU fitted
 }  // namespace
 
 Robot& Robot::instance() {
@@ -68,13 +65,13 @@ void Robot::begin() {
   encRight_.begin(cfg::PIN_ENC_R);
   const float mmPerTick = PI * cfg::TREAD_SPROCKET_DIAMETER_MM / cfg::ENC_TICKS_PER_WHEEL_REV;
   drive_.begin(&motors_, &encLeft_, &encRight_,
-               {mmPerTick, cfg::TRACK_WIDTH_MM, kMaxSpeedMmps, kTurnSlipFactor}, &Robot::headingDeg);
+               {mmPerTick, cfg::TRACK_WIDTH_MM, cfg::MAX_SPEED_MMPS, cfg::TURN_SLIP_FACTOR}, &Robot::headingDeg);
 
   battery_.begin(cfg::PIN_BATTERY, cfg::BATTERY_DIVIDER);
   touch_.begin(cfg::PIN_TOUCH);
 
   if (!mic_.begin(I2S_NUM_0, {cfg::PIN_MIC_BCLK, cfg::PIN_MIC_WS, cfg::PIN_MIC_SD},
-                  cfg::MIC_SAMPLE_RATE, cfg::MIC_GAIN_SHIFT)) {
+                  cfg::MIC_SAMPLE_RATE, cfg::MIC_GAIN_SHIFT, cfg::MIC_USE_RIGHT_SLOT)) {
     log_e("Microphone init failed");
   }
   if (!speaker_.begin(I2S_NUM_1, {cfg::PIN_SPK_BCLK, cfg::PIN_SPK_LRC, cfg::PIN_SPK_DIN},
@@ -105,7 +102,7 @@ void Robot::displayTask() {
   for (;;) {
     const uint32_t now = millis();
     if (imuOk_ && imu_.update()) {
-      yawDeg_ = imu_.yawDeg() * kImuYawSign;
+      yawDeg_ = imu_.yawDeg() * cfg::IMU_YAW_SIGN;
       pickedUp_ = imu_.pickedUp();
       if (imu_.shockDetected()) shock_ = true;
     }
@@ -245,6 +242,9 @@ void Robot::updateReflexes(uint32_t now) {
       lights_.setBase(behavior::BackpackLights::Pattern::kBreathe, 140, 0.5f);
       speaker_.tone(700, 1200, 120);
     } else {
+      // The brain went away: don't stay stuck "listening" or "thinking".
+      if (mode_ != Mode::kIdle && !anim_.busy()) setMode(Mode::kIdle);
+      mode_ = Mode::kIdle;
       lights_.setBase(behavior::BackpackLights::Pattern::kBreathe, 220, 0.4f);
       if (!link_.wifiUp()) face_.showText("NO WIFI", COZMO_WIFI_SSID, 2000);
     }

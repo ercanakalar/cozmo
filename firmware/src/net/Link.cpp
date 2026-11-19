@@ -105,9 +105,13 @@ void Link::readLines() {
 
 bool Link::send(const JsonDocument& msg) {
   if (!client_.connected()) return false;
-  char buf[512];
+  char buf[768];
+  if (measureJson(msg) >= sizeof(buf) - 1) {
+    log_w("Outgoing message too large");
+    return false;
+  }
   const size_t n = serializeJson(msg, buf, sizeof(buf) - 1);
-  if (n == 0 || n >= sizeof(buf) - 1) return false;
+  if (n == 0) return false;
   buf[n] = '\n';
   return client_.write(reinterpret_cast<const uint8_t*>(buf), n + 1) == n + 1;
 }
