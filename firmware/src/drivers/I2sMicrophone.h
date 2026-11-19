@@ -14,7 +14,8 @@ class I2sMicrophone {
     int data;
   };
 
-  bool begin(i2s_port_t port, const Pins& pins, uint32_t sampleRate, int gainShift);
+  bool begin(i2s_port_t port, const Pins& pins, uint32_t sampleRate, int gainShift,
+             bool rightSlot = false);
   // Blocks until `count` samples are read (or timeout). Returns samples read.
   size_t read(int16_t* out, size_t count, TickType_t timeout = portMAX_DELAY);
   // RMS of the last read() block, 0..32767.

@@ -4,6 +4,7 @@
 // stream buffer; a background task drains it into the I2S DMA.
 #include <Arduino.h>
 #include <driver/i2s.h>
+#include <freertos/semphr.h>
 #include <freertos/stream_buffer.h>
 
 namespace drivers {
@@ -40,6 +41,7 @@ class I2sSpeaker {
   i2s_port_t port_ = I2S_NUM_1;
   uint32_t sampleRate_ = 16000;
   StreamBufferHandle_t queue_ = nullptr;
+  SemaphoreHandle_t writeLock_ = nullptr;  // stream buffers allow only one writer at a time
   volatile float volume_ = 0.7f;
   volatile float level_ = 0.0f;
   volatile uint32_t lastPlayMs_ = 0;

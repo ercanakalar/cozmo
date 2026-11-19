@@ -32,14 +32,18 @@ bool I2sSpeaker::begin(i2s_port_t port, const Pins& pins, uint32_t sampleRate, s
   i2s_zero_dma_buffer(port_);
 
   queue_ = xStreamBufferCreate(bufferBytes, sizeof(int16_t));
-  if (queue_ == nullptr) return false;
+  writeLock_ = xSemaphoreCreateMutex();
+  if (queue_ == nullptr || writeLock_ == nullptr) return false;
   xTaskCreatePinnedToCore(&I2sSpeaker::taskEntry, "speaker", 4096, this, 5, nullptr, 0);
   return true;
 }
 
 size_t I2sSpeaker::write(const int16_t* samples, size_t count, TickType_t timeout) {
   if (queue_ == nullptr) return 0;
+  // Network audio (core 0) and local chirps (control loop) both write here.
+  if (xSemaphoreTake(writeLock_, timeout + pdMS_TO_TICKS(5)) != pdTRUE) return 0;
   const size_t sent = xStreamBufferSend(queue_, samples, count * sizeof(int16_t), timeout);
+  xSemaphoreGive(writeLock_);
   return sent / sizeof(int16_t);
 }
 
@@ -79,7 +83,10 @@ void I2sSpeaker::silence(uint32_t durationMs) {
 }
 
 void I2sSpeaker::flushQueue() {
-  if (queue_ != nullptr) xStreamBufferReset(queue_);
+  if (queue_ == nullptr) return;
+  xSemaphoreTake(writeLock_, portMAX_DELAY);
+  xStreamBufferReset(queue_);  // may fail while the reader task is blocked; harmless
+  xSemaphoreGive(writeLock_);
 }
 
 void I2sSpeaker::taskEntry(void* arg) { static_cast<I2sSpeaker*>(arg)->run(); }

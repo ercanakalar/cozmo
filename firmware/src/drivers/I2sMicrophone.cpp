@@ -4,7 +4,8 @@
 
 namespace drivers {
 
-bool I2sMicrophone::begin(i2s_port_t port, const Pins& pins, uint32_t sampleRate, int gainShift) {
+bool I2sMicrophone::begin(i2s_port_t port, const Pins& pins, uint32_t sampleRate, int gainShift,
+                          bool rightSlot) {
   port_ = port;
   gainShift_ = gainShift;
 
@@ -12,7 +13,7 @@ bool I2sMicrophone::begin(i2s_port_t port, const Pins& pins, uint32_t sampleRate
   config.mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_RX);
   config.sample_rate = sampleRate;
   config.bits_per_sample = I2S_BITS_PER_SAMPLE_32BIT;  // INMP441 sends 24 bits in a 32 bit slot
-  config.channel_format = I2S_CHANNEL_FMT_ONLY_LEFT;   // L/R pin tied to GND
+  config.channel_format = rightSlot ? I2S_CHANNEL_FMT_ONLY_RIGHT : I2S_CHANNEL_FMT_ONLY_LEFT;
   config.communication_format = I2S_COMM_FORMAT_STAND_I2S;
   config.intr_alloc_flags = ESP_INTR_FLAG_LEVEL1;
   config.dma_buf_count = 6;

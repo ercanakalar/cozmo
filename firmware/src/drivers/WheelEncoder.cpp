@@ -3,8 +3,8 @@
 namespace drivers {
 
 void WheelEncoder::begin(int pin) {
-  // GPIO34..39 have no internal pull-ups: fit a 10k resistor to 3V3.
-  pinMode(pin, INPUT);
+  // GPIO34..39 have no internal pull-ups: fit a 10k resistor to 3V3 there.
+  pinMode(pin, pin >= 34 ? INPUT : INPUT_PULLUP);
   attachInterruptArg(digitalPinToInterrupt(pin), &WheelEncoder::onEdge, this, RISING);
 }
 
